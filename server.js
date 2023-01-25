@@ -19,6 +19,15 @@ const sendMessage = (message, origin) => {
   }
 }
 
+const isValidName = (username) => {
+  for(const socket of connections.keys()){
+    if(connections.get(socket) === username){
+      return false;
+    }
+  }
+  return true;
+}
+
 const listen = (port) => {
   const server = new Server();
 
@@ -27,11 +36,9 @@ const listen = (port) => {
     console.log(`New connection from ${remoteSocket}`)
     socket.setEncoding('utf-8')
 
-    const values = [...connections.values()];
-
     socket.on('data', (message) => {
       if (!connections.has(socket)) {
-        if (values.includes(message)) {
+        if (!isValidName(message)) {
           socket.write(ERR);
         } else {
           connections.set(socket, message);
